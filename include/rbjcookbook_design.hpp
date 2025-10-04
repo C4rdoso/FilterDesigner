@@ -31,27 +31,27 @@ namespace FilterDesigner {
 		}
 
 		auto createSOS() -> bool override {
-      //Frequência de corte digital pré-distorcida
-      const precision omega  = precision(2) * M_PI * this->m_first_cutoff / this->m_sample_rate;
-      const precision cos_w0 = cos(omega);
-      const precision sin_w0 = sin(omega);
+      		//Frequência de corte digital pré-distorcida
+      		const precision omega  = precision(2) * M_PI * this->m_first_cutoff / this->m_sample_rate;
+      		const precision cos_w0 = cos(omega);
+      		const precision sin_w0 = sin(omega);
 
-      //Qualidade fixa (Butterworth 2ª ordem: ~0.707)
-      const precision quality = precision(1) / sqrt(precision(2));
-      const precision alpha   = sin_w0 / (precision(2) * quality);
+      		//Qualidade fixa (Butterworth 2ª ordem: ~0.707)
+      		const precision quality = precision(1) / sqrt(precision(2));
+      		const precision alpha   = sin_w0 / (precision(2) * quality);
       
-      //Coeficientes RBJ Low-pass
-      precision a0 = precision(1) + alpha;
+      		//Coeficientes RBJ Low-pass
+      		precision a0 = precision(1) + alpha;
   
-      precision b0 = (precision(1) - cos_w0) / (precision(2) * a0);
-      precision b1 = (precision(1) - cos_w0) / a0;
-      precision b2 = (precision(1) - cos_w0) / (precision(2) * a0);
-      precision a1 = (-precision(2) * cos_w0) / a0;
-      precision a2 = (precision(1) - alpha) / a0;
+      		precision b0 = (precision(1) - cos_w0) / (precision(2) * a0);
+      		precision b1 = (precision(1) - cos_w0) / a0;
+      		precision b2 = (precision(1) - cos_w0) / (precision(2) * a0);
+      		precision a1 = (-precision(2) * cos_w0) / a0;
+      		precision a2 = (precision(1) - alpha) / a0;
   
-      //  Forma as seções SOS
-      for (size_t index = 0; index < this->m_num_sos; index++)
-          this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+      		//Forma as seções SOS
+      		for (size_t index = 0; index < this->m_num_sos; index++)
+      		    this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 
 			//Caso tenha chegado até aqui, indica sucesso
 			return true;
@@ -84,27 +84,27 @@ namespace FilterDesigner {
 		}
 
 		auto createSOS() -> bool override {
-      //Frequência de corte digital pré-distorcida
-      const precision omega  = precision(2) * M_PI * this->m_first_cutoff / this->m_sample_rate;
-      const precision cos_w0 = cos(omega);
-      const precision sin_w0 = sin(omega);
+      		//Frequência de corte digital pré-distorcida
+      		const precision omega  = precision(2) * M_PI * this->m_first_cutoff / this->m_sample_rate;
+      		const precision cos_w0 = cos(omega);
+      		const precision sin_w0 = sin(omega);
   
-      //Qualidade fixa (Butterworth 2ª ordem: ~0.707)
-      const precision quality = precision(1) / sqrt(precision(2));
-      const precision alpha = sin_w0 / (precision(2) * quality);
+      		//Qualidade fixa (Butterworth 2ª ordem: ~0.707)
+      		const precision quality = precision(1) / sqrt(precision(2));
+      		const precision alpha = sin_w0 / (precision(2) * quality);
   
-      //Coeficientes RBJ High-pass
-      precision a0 = precision(1) + alpha;
+      		//Coeficientes RBJ High-pass
+      		precision a0 = precision(1) + alpha;
   
-      precision b0 = (precision(1) + cos_w0) / (precision(2) * a0);
-      precision b1 = -(precision(1) + cos_w0) / a0;
-      precision b2 = (precision(1) + cos_w0) / (precision(2) * a0);
-      precision a1 = (-precision(2) * cos_w0) / a0;
-      precision a2 = (precision(1) - alpha) / a0;
+      		precision b0 = (precision(1) + cos_w0) / (precision(2) * a0);
+      		precision b1 = -(precision(1) + cos_w0) / a0;
+      		precision b2 = (precision(1) + cos_w0) / (precision(2) * a0);
+      		precision a1 = (-precision(2) * cos_w0) / a0;
+      		precision a2 = (precision(1) - alpha) / a0;
   
-      //Forma as seções SOS
-      for (size_t index = 0; index < this->m_num_sos; index++)
-          this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+      		//Forma as seções SOS
+      		for (size_t index = 0; index < this->m_num_sos; index++)
+      		    this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 
 			//Caso tenha chegado até aqui, indica sucesso
 			return true;
@@ -143,18 +143,18 @@ namespace FilterDesigner {
 			const precision bandwidth = precision(2) * M_PI * (this->m_second_cutoff -  this->m_first_cutoff) / this->m_sample_rate;
 			const precision omega 		= precision(2) * M_PI * sqrt(this->m_first_cutoff * this->m_second_cutoff) / this->m_sample_rate;
 
-      //ω para RBJ (digital) obtido a partir da pré-distorção analógica
-      const precision alpha  = sin(omega) * sinh(log(precision(2))/precision(2) * bandwidth / omega);
+      		//ω para RBJ (digital) obtido a partir da pré-distorção analógica
+      		const precision alpha  = sin(omega) * sinh(log(precision(2))/precision(2) * bandwidth / omega);
 			const precision cos_w0 = cos(omega);
 
-      //coeficientes analíticos do RBJ para lowpass
+      		//coeficientes analíticos do RBJ para lowpass
 			precision a0 = precision(1) + alpha;
 
-      precision b0 = alpha / a0;
-      precision b1 = 0;
-      precision b2 = -alpha / a0;
-      precision a1 = -precision(2) * cos_w0 / a0;
-      precision a2 = (precision(1) - alpha) / a0;
+      		precision b0 = alpha / a0;
+      		precision b1 = 0;
+      		precision b2 = -alpha / a0;
+      		precision a1 = -precision(2) * cos_w0 / a0;
+      		precision a2 = (precision(1) - alpha) / a0;
 
 			//Forma os biquads a partir dos coeficientes de segunda ordem
 			for (size_t index = 0; index < this->m_num_sos; index++)
