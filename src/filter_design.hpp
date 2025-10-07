@@ -1,74 +1,83 @@
+/**
+ * @file filter_design.hpp
+ * @brief Defines the virtual class that is inherited by all implemented IIR digital filters
+ *
+ * @author Gabriel Cardoso da Silva
+ * @date Octuber 7, 2025
+ */
+
 #ifndef FILTER_DESIGN_HPP
 #define FILTER_DESIGN_HPP
 
 #include "math_utils.hpp"
 
 namespace FilterDesigner {
-  
+	/* IIR Designer declaration
+	 * The number of bytes allocated will be based on template parameters */
 	template<typename precision, size_t num_poles, size_t num_zeros, size_t num_sos>
 	class IIRGenericDesign {
 	public:
-		//Armazena as dimensões dos arrays
+		//Stores the dimensions of the arrays
 		const size_t m_num_poles		{ num_poles };
 		const size_t m_num_zeros		{ num_zeros };
 		const size_t m_num_sos			{ num_sos };
 
-		//Zeros e polos do filtro
+		//Filter zeros and poles
 		Complex<precision> m_poles[num_poles > 0 ? num_poles : 1];
 		Complex<precision> m_zeros[num_zeros > 0 ? num_zeros : 1];
 
-		//Seções de segunda ordem do filtro
+		//Second-order sections of the filter
 		BiquadSection<precision> m_sos_sections[num_sos > 0 ? num_sos : 1];
 
-		//Ganho inicial e ganho global do filtro
+		//Initial gain and global gain of the filter
 		precision m_overall_gain		{ precision(0) };
 
-		//Parâmetros de configuração do filtro
+		//Filter configuration parameters
 		precision m_first_cutoff		{ precision(0) };
 		precision m_second_cutoff		{ precision(0) };
 		precision m_sample_rate			{ precision(0) };
 
 		auto design() -> bool {
-			//A primeira frequência de corte deve ser maior que zero
+			//The first cutoff frequency must be greater than zero
 			if (m_first_cutoff <= 0) return false;
 
-			//A segunda frequência de corte deve ser maior que a primeira (caso exista)
+			//The second cutoff frequency must be greater than the first (if it exists)
 			if (m_second_cutoff > 0 && m_second_cutoff <= m_first_cutoff) return false;
 
 			//---------------------------------------------------------------
-			// Pipeline de projeto do filtro 
+			// Filter design pipeline 
 			// 
-			// 1o passo: Gera o protótipo analógico
-			// 2o passo: Converte o projeto analógico em digital
-			// 3o passo: Gera as seções de segunda ordem
+			// Step 1: Generate the analog prototype
+			// Step 2: Convert the analog design to digital
+			// Step 3: Generate the second-order sections
 			//---------------------------------------------------------------
 			if (!createPrototype()) return false;
 			if (!convertPrototype()) return false;
 			if (!createSOS()) return false;
 
-			//Indica que o projeto foi realizado com sucesso
+			//Indicates that the design was completed successfully
 			m_design_ok = true;
 
-			//Retorna o status do projeto
+			//Returns the design status
 			return m_design_ok;
 		}
 
-		/* @return Verdadeiro se o design do filtro ocorreu com sucesso. */
+		/* @return True if the filter design was successful. */
 		auto designSuccess()	const -> bool { return m_design_ok; }
 
 	private:
-		//Indica se o projeto foi realizado com sucesso
+		//Indicates whether the design was completed successfully
 		bool m_design_ok{ false };
 
 	protected:
-		/* Método virtual para criação do protótipo do filtro
-		 * @return Verdadeiro se a criação do protótipo ocorrer com sucesso */
+		/* Virtual method for creating the filter prototype
+		 * @return True if the prototype creation was successful */
 		virtual auto createPrototype() -> bool = 0;
-		/* Método virtual para conversão do protótipo analógico para digital
-		 * @return Verdadeiro se a conversão do protótipo ocorrer com sucesso */
+		/* Virtual method for converting the analog prototype to digital
+		 * @return True if the prototype conversion was successful */
 		virtual auto convertPrototype() -> bool = 0;
-		/* Método virtual para criação das seções de segunda ordem
-		 * @return Verdadeiro se a criação das sessoes ocorrer com sucesso */
+		/* Virtual method for creating the second-order sections
+ 		 * @return True if the section creation was successful */
 		virtual auto createSOS() -> bool = 0;
 	};
 

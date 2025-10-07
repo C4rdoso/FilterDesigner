@@ -1,0 +1,28 @@
+# Objects
+Complex KEYWORD1
+BiquadSection   KEYWORD1
+IIRGenericDesign    KEYWORD1
+ButterworthLowpass  KEYWORD1
+ButterworthHighpass KEYWORD1
+ButterworthBandpass KEYWORD1
+RBJCookbookLowpass  KEYWORD1
+RBJCookbookHighpass KEYWORD1
+RBJCookbookBandpass KEYWORD1
+
+# Methods
+max KEYWORD2
+real    KEYWORD2
+imag    KEYWORD2
+cabs    KEYWORD2
+csqrt   KEYWORD2
+process KEYWORD2
+bilinearTransform   KEYWORD2
+planeConversion KEYWORD2
+zpk2Biquads KEYWORD2
+design  KEYWORD2
+createPrototype KEYWORD2
+convertPrototype    KEYWORD2
+createSOS   KEYWORD2
+designSuccess   KEYWORD2
+
+# Constants

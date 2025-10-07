@@ -35,6 +35,7 @@ ButterworthBandpass<float, g_order> filter(g_samples, g_lowcut, g_highcut);
 //Checks if filter synthesis fail
 if (!filter.designSuccess()) while (true) { }
 
+//= LOOP ================================================================== 
 //Sinusoidal signals
 float s1 = sin(1.0 * PI * 10.0 * interval_micros);  //10 Hz
 float s2 = sin(1.0 * PI * 20.0 * interval_micros);  //20 Hz
@@ -53,7 +54,7 @@ for (size_t index = 0; index < filter.m_num_sos; index++)
 
 ### 🔧 Planned Improvements
 
-- Translate documentation into English
+- Fix odd order filter generation
 - Add support for arbitrary band-stop filters
 - Add Chebyshev Type I and Elliptic filter designs
 - Add CMSIS support for ARM architecture

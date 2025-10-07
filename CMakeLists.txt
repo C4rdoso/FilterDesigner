@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 set(NOME_PROJETO "FilterDesigner")              #Defina o nome do projeto
-set(VERSAO_PROJETO 0.0.1)					    #Defina a versão do projeto
+set(VERSAO_PROJETO 1.0.2)					    #Defina a versão do projeto
 
 #=================================================================================
 #   PROPRIEDADES DE PROJETO
@@ -33,10 +33,10 @@ endif()
 #Bibliotecas necessárias para a compilção 
 
 #Procura e lista todos os arquivos de fonte .cpp dentro da pastar src
-file(GLOB ARQUIVOS_FONTE CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB ARQUIVOS_FONTE CONFIGURE_DEPENDS "tests/*.cpp")
 
 #Cria a biblioteca estática passando os arquivos de fonte
 add_executable(${NOME_PROJETO} ${ARQUIVOS_FONTE})
 
 #Vincula na biblioteca o diretório de arquivos de inclusão
-target_include_directories(${NOME_PROJETO} PUBLIC include)
+target_include_directories(${NOME_PROJETO} PUBLIC src)

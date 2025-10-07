@@ -1,13 +1,22 @@
+/**
+ * @file math_utils.hpp
+ * @brief Define some math tools tha are required in this project
+ *
+ * @author Gabriel Cardoso da Silva
+ * @date Octuber 7, 2025
+ */
+
 #ifndef MATH_UTILS_HPP
 #define MATH_UTILS_HPP
 
-//Inclui as definições padrões por plataforma
+//Include the platform definitions
 #include "platform_definitions.hpp"
 
+//If the system has support with STL
 #if HAS_STL_SUPPORT
-#	include <cmath>		//Ferramentas matemáticas básicas da STL
-#	include <cstdint>  	//Tipos inteiros com tamanho fixo
-#	include <complex>	//Suporte a números complexos da STL
+#	include <cmath>
+#	include <cstdint>
+#	include <complex>
 #endif
 
 namespace FilterDesigner {
@@ -15,11 +24,15 @@ namespace FilterDesigner {
 #if !HAS_STL_SUPPORT
 	template <typename precision>
 	struct Complex {
-		//Parte real e imaginária do número complexo
+		//Real and imaginary parts
 		precision m_real;
 		precision m_imag;
 
+		/* Default constructor for complex number
+		 * @param precision Real part of the complex number 
+		 * @param precision Imaginary part of the complex number */
 		Complex(const precision& real = 0, const precision& imag = 0) : m_real(real), m_imag(imag) {}
+
 
 		auto operator+(const Complex& other) const -> Complex {
 			return Complex(m_real + other.m_real, m_imag + other.m_imag);
@@ -44,7 +57,7 @@ namespace FilterDesigner {
 			);
 		}
 
-		//Operações Complexo <-> Real
+		// --- Complex and real number operations --- 
 		auto operator+(precision value) const -> Complex {
 			return Complex(m_real + value, m_imag);
 		}
@@ -58,7 +71,7 @@ namespace FilterDesigner {
 			return Complex(m_real / value, m_imag / value);
 		}
 
-		//Atribuições compostas (+=, -=, *=, /=) com Complex
+		// --- Compound assignments (+=, -=, *=, /=) --- 
 		auto operator+=(const Complex& other) -> Complex& {
 			m_real += other.m_real; m_imag += other.m_imag; return *this;
 		}
@@ -79,20 +92,20 @@ namespace FilterDesigner {
 			return *this;
 		}
 
-		//Atribuições compostas com real
+		// --- Compound assignments between complex and real number --- 
 		auto operator+=(precision value) -> Complex& { m_real += value; return *this; }
 		auto operator-=(precision value) -> Complex& { m_real -= value; return *this; }
 		auto operator*=(precision value) -> Complex& { m_real *= value; m_imag *= value; return *this; }
 		auto operator/=(precision value) -> Complex& { m_real /= value; m_imag /= value; return *this; }
 		
-		/* @return O valor real do número complexo */
+		/* @return The value of the real part */
 		auto real() const -> precision { return m_real; }
-		/* @return O valor imaginário do número complexo */
+		/* @return The value of the imaginary part */
 		auto imag() const -> precision { return m_imag; }
 	};
 
 
-	// --- Operadores globais Real <-> Complex (quando real está à esquerda) ---
+	// --- Global operations between real and complex number (real number on the left side) ---
 	template <typename precision>
 	auto operator+(precision lhs, const Complex<precision>& rhs) -> Complex<precision> {
 		return Complex<precision>(lhs + rhs.m_real, rhs.m_imag);
@@ -114,17 +127,17 @@ namespace FilterDesigner {
 		return Complex<precision>((lhs * rhs.m_real) / denom, (-lhs * rhs.m_imag) / denom);
 	}
 
-	/* Calcula a magnetude ou norma do número complexo 
-	 * @param Complex<precision>& Número complexo de entrada 
-	 * @return A magnetude ou norma do número complexo */
+	/* Magnetude of a complex number
+	 * @param Complex<precision>& Complex number
+	 * @return The magnetude of the complex number */
 	template<typename precision>
 	auto cabs(const Complex<precision>& target) -> precision { 
 		return sqrt(target.m_real * target.m_real + target.m_imag * target.m_imag); 
 	}
 
-	/* Calcula a raiz quadrada de um número complexo
-	 * @param Complex<precision>& Número complexo de entrada 
-	 * @return O número complexo resultante */
+	/* Square root for complex numbers
+	 * @param Complex<precision>& Complex number
+	 * @return Square root result */
 	template<typename precision>
 	auto csqrt(const Complex<precision>& value) -> Complex<precision> {
 		precision magnitude = sqrt(sqrt(value.m_real * value.m_real + value.m_imag * value.m_imag));
@@ -133,24 +146,24 @@ namespace FilterDesigner {
 	}
 
 #else
-	//Usa a implementação de números complexos da STL
+	//Use STL version of the complex number
 	template<typename precision>
 	using Complex = std::complex<precision>;
 
-	//Apenas usa a função max implementada pela stl
+	//Use STL max function for complex and real numbers
 	using std::max;
 
-	/* Calcula a magnetude ou norma do número complexo 
-	 * @param Complex<precision>& Número complexo de entrada 
-	 * @return A magnetude ou norma do número complexo */
+	/* Magnetude of a complex number
+	 * @param Complex<precision>& Complex number
+	 * @return The magnetude of the complex number */
 	template<typename precision>
 	auto cabs(const Complex<precision>& target) -> precision { 
 		return std::abs(target);
 	}
 
-	/* Calcula a raiz quadrada de um número complexo
-	 * @param Complex<precision>& Número complexo de entrada 
-	 * @return O número complexo resultante */
+	/* Square root for complex numbers
+	 * @param Complex<precision>& Complex number
+	 * @return Square root result */
 	template<typename precision>
 	auto csqrt(const Complex<precision>& value) -> Complex<precision> {
 		precision magnitude = std::sqrt(std::sqrt(value.real() * value.real() + value.imag() * value.imag()));
@@ -160,27 +173,29 @@ namespace FilterDesigner {
 
 #endif
 
+	/* DF2 Biquad class defintion for real time signal processing
+	 * @see https://www.mathworks.com/help/dsphdl/ref/biquadfilter.html */
 	template<typename precision>
 	struct BiquadSection {
-		//Coeficientes do filtro biquad de segunda ordem
+		//Coefficients
 		precision m_b0, m_b1, m_b2, m_a1, m_a2;
 
-		//Controle de processo
+		//Time memory
 		precision m_z1 = 0.0, m_z2 = 0.0;
 
-		/* Construtor padrão da sessão de segunda ordem */
+		/* Default constructor for DF2 Biquad */
 		BiquadSection()
 		: m_b0(0.0), m_b1(0.0), m_b2(0.0), m_a1(0.0), m_a2(0.0) { }
 
-		/* Cria uma sessão de segunda ordem na forma direta 2
-		 * @param double& b Numeradores da sessão
-		 * @param double& a Denominadores da sessão */
+		/* Creates a DF2 Biquad
+		 * @param precision& b Numerator coefficients
+		 * @param precision& a Denominator coefficients */
 		BiquadSection(const precision& b0, const precision& b1, const precision& b2, const precision& a0, const precision& a1, const precision& a2)
 		: m_b0(b0 / a0), m_b1(b1 / a0), m_b2(b2 / a0), m_a1((-a1) / a0), m_a2((-a2) / a0) { }
 
-		/* Realiza o processamento de um sinal de entrada
-		 * @param double& x Sinal de entrada
-		 * @return O Sinal de entrada processado pela sessão */
+		/* Signal process
+		 * @param precision& x Input signal
+		 * @return The result signal */
 		auto process(const precision& x) -> precision {
 			precision output = m_b0 * x + m_z1;
 			m_z1 = m_b1 * x - m_a1 * output + m_z2;
@@ -199,54 +214,55 @@ namespace FilterDesigner {
 
 	template<typename precision>
 	inline auto planeConversion(const precision& initial_gain, Complex<precision>* poles, const size_t num_poles, Complex<precision>* zeros, const size_t num_zeros) -> precision {
-		//O ganho após a conversão deve ser um ajuste do ganho inicial
+		//The gain after conversion must be an adjustment of the initial gain
 		double blt_gain = initial_gain;
 
-		//Ajusta o ganho e aplica a transformação bilinear dos zeros
+		//Adjusts the gain and applies the bilinear transform of the zeros
 		for (uint32_t i = 0; i < num_zeros; i++) {
 			blt_gain /= bilinearTransform<precision>(zeros[i]);
 		}
 
-		//Ajusta o ganho e aplica a transformação bilinear dos polos
+		//Adjusts the gain and applies the bilinear transform of the poles
 		for (uint32_t i = 0; i < num_poles; i++) {
 			blt_gain *= bilinearTransform<precision>(poles[i]);
 		}
 
-		//Retorna o ganho após a transformação
+		//Returns the gain after the transformation
 		return blt_gain;
 	}
 
 	template<typename precision>
 	inline auto zpk2Biquads(Complex<precision>* poles, const size_t num_poles, Complex<precision>* zeros, const size_t num_zeros, precision overall_gain, BiquadSection<precision>* biquads, const size_t num_biquads) -> size_t {
-		//Ordem do filtro
+		//Filter order
 		const size_t filter_order = max(num_zeros, num_poles);
 
-		//Número de seções necessárias
+		//Number of required sections
 		const size_t num_sections = (filter_order + 1) / 2;
 
-		//Verifica se temos espaço suficiente no array
+		//Checks if we have enough space in the array
 		if (num_sections > num_biquads) return false;
 
+		//Keep track of the last processed section
 		size_t last_section_index = 0;
 
-		//Processa pares
+		//Processes the pairs
 		for (size_t i = 0; i + 1 < filter_order; i += 2, last_section_index++) {
 			const auto first_zero = i < num_zeros ? zeros[i] :			Complex<precision>(-1, 0);
 			const auto second_zero = i + 1 < num_zeros ? zeros[i + 1] : Complex<precision>(-1, 0);
 			const auto first_pole = i < num_poles ? poles[i] :			Complex<precision>(0, 0);
 			const auto second_pole = i + 1 < num_poles ? poles[i + 1] : Complex<precision>(0, 0);
 
-			//Numerador
+			//Numerator
 			precision b0 = 1.0;
 			precision b1 = -(first_zero + second_zero).real();
 			precision b2 = (first_zero * second_zero).real();
 
-			//Denominador
+			//Denominator
 			precision a0 = 1.0;
 			precision a1 = -(first_pole + second_pole).real();
 			precision a2 = (first_pole * second_pole).real();
 
-			//Aplica o ganho global apenas na primeira seção
+			//Applies the global gain only in the first section
 			if (last_section_index == 0) {
 				b0 *= overall_gain;
 				b1 *= overall_gain;
@@ -256,7 +272,7 @@ namespace FilterDesigner {
 			biquads[last_section_index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 		}
 
-		//Caso a ordem do filtro seja ímpar, o último polo e zero são tratados separadamente
+		//If the filter order is odd, the last pole and zero are handled separately
 		if (filter_order % 2 == 1) {
 			const auto last_zero = (filter_order - 1 < num_zeros) ? zeros[filter_order - 1] : Complex<precision>(-1, 0);
 			const auto last_pole = (filter_order - 1 < num_poles) ? poles[filter_order - 1] : Complex<precision>(0, 0);
@@ -269,7 +285,7 @@ namespace FilterDesigner {
 			precision a1 = -last_pole.real();
 			precision a2 = 0.0;
 
-			//Aplica ganho na primeira seção (se ela for justamente essa)
+			//Applies gain in the first section (if it is exactly this one)
 			if (last_section_index == 0) {
 				b0 *= overall_gain;
 				b1 *= overall_gain;
@@ -280,7 +296,7 @@ namespace FilterDesigner {
 			last_section_index++;
 		}
 
-		//Indica para o usuário quantas sessões foram realmente geradas
+		//Indicates to the user how many sections were actually generated
 		return last_section_index; 
 	}
 
