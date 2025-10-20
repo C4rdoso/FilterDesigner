@@ -8,6 +8,9 @@ ButterworthBandpass KEYWORD1
 RBJCookbookLowpass  KEYWORD1
 RBJCookbookHighpass KEYWORD1
 RBJCookbookBandpass KEYWORD1
+Chebyshev1Lowpass   KEYWORD1
+Chebyshev1Highpass  KEYWORD1
+Chebyshev1Bandpass  KEYWORD1
 
 # Methods
 max KEYWORD2
@@ -15,6 +18,7 @@ real    KEYWORD2
 imag    KEYWORD2
 cabs    KEYWORD2
 csqrt   KEYWORD2
+asinh   KEYWORD2
 process KEYWORD2
 bilinearTransform   KEYWORD2
 planeConversion KEYWORD2
