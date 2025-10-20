@@ -110,7 +110,7 @@ namespace FilterDesigner {
                 this->m_poles, this->m_num_poles,
                 this->m_zeros, this->m_num_zeros,
                 this->m_overall_gain,
-                this->m_sos_sections, this->m_num_sos
+                this->m_biquads, this->m_num_biquads
             );
             
             return true;
@@ -227,7 +227,7 @@ namespace FilterDesigner {
                 this->m_poles, this->m_num_poles,
                 this->m_zeros, this->m_num_zeros,
                 this->m_overall_gain,
-                this->m_sos_sections, this->m_num_sos
+                this->m_biquads, this->m_num_biquads
             );
             
             return true;
@@ -382,7 +382,7 @@ namespace FilterDesigner {
                 this->m_poles, this->m_num_poles,
                 this->m_zeros, this->m_num_zeros,
                 this->m_overall_gain,
-                this->m_sos_sections, this->m_num_sos
+                this->m_biquads, this->m_num_biquads
             );
             
             return true;

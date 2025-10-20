@@ -14,20 +14,20 @@
 namespace FilterDesigner {
 	/* IIR Designer declaration
 	 * The number of bytes allocated will be based on template parameters */
-	template<typename precision, size_t num_poles, size_t num_zeros, size_t num_sos>
+	template<typename precision, size_t num_poles, size_t num_zeros, size_t num_biquads>
 	class IIRGenericDesign {
 	public:
 		//Stores the dimensions of the arrays
 		const size_t m_num_poles		{ num_poles };
 		const size_t m_num_zeros		{ num_zeros };
-		const size_t m_num_sos			{ num_sos };
+		const size_t m_num_biquads		{ num_biquads };
 
 		//Filter zeros and poles
 		Complex<precision> m_poles[num_poles > 0 ? num_poles : 1];
 		Complex<precision> m_zeros[num_zeros > 0 ? num_zeros : 1];
 
 		//Second-order sections of the filter
-		BiquadSection<precision> m_sos_sections[num_sos > 0 ? num_sos : 1];
+		BiquadSection<precision> m_biquads[num_biquads > 0 ? num_biquads : 1];
 
 		//Initial gain and global gain of the filter
 		precision m_overall_gain		{ precision(0) };

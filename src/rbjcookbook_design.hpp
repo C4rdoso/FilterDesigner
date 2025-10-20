@@ -60,8 +60,8 @@ namespace FilterDesigner {
       		precision a2 = (precision(1) - alpha) / a0;
   
       		//Forms the SOS sections
-      		for (size_t index = 0; index < this->m_num_sos; index++)
-      		    this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+      		for (size_t index = 0; index < this->m_num_biquads; index++)
+      		    this->m_biquads[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 
 			//If it reached this point, indicates success
 			return true;
@@ -113,8 +113,8 @@ namespace FilterDesigner {
       		precision a2 = (precision(1) - alpha) / a0;
   
       		//Forms the SOS sections
-      		for (size_t index = 0; index < this->m_num_sos; index++)
-      		    this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+      		for (size_t index = 0; index < this->m_num_biquads; index++)
+      		    this->m_biquads[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 
 			//If it reached this point, indicates success
 			return true;
@@ -167,8 +167,8 @@ namespace FilterDesigner {
       		precision a2 = (precision(1) - alpha) / a0;
 
 			//Forms the biquads from the second-order coefficients
-			for (size_t index = 0; index < this->m_num_sos; index++)
-				this->m_sos_sections[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+			for (size_t index = 0; index < this->m_num_biquads; index++)
+				this->m_biquads[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
 
 			//If it reached this point, indicates success
 			return true;
