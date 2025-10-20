@@ -46,8 +46,8 @@ float input = s1 + s2 + s3;
 
 //​Generates the output signal using a raw signal through biquad cascade.
 float output = input;
-for (size_t index = 0; index < filter.m_num_sos; index++)
-      output = filter.m_sos_sections[index].process(output);
+for (size_t index = 0; index < filter.m_num_biquads; index++)
+      output = filter.m_biquads[index].process(output);
 ```
 
 ![Filter Response](docs/filter_response.png)

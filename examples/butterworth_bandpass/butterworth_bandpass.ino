@@ -45,8 +45,8 @@ void loop() {
 
     //​Generates the output signal using a raw signal through biquad cascade.
     float out_signal = raw_signal;
-    for (size_t index = 0; index < filter.m_num_sos; index++)
-      out_signal = filter.m_sos_sections[index].process(out_signal);
+    for (size_t index = 0; index < filter.m_num_biquads; index++)
+      out_signal = filter.m_biquads[index].process(out_signal);
     
     //Raw signal and output signal plot with some DC offset
     Serial.print("Input:");
