@@ -145,6 +145,14 @@ namespace FilterDesigner {
 		return Complex<precision>(magnitude * cos(angle), magnitude * sin(angle));
 	}
 
+	/* Some architectures does not provide asinh function by default
+	 * @param value& Input value
+	 * @return Result of the asinh function */
+	template <typename precision>
+	auto asinh(const precision& value) -> precision {
+		return log(value + sqrt(value * value + 1));
+	}
+
 #else
 	//Use STL version of the complex number
 	template<typename precision>
