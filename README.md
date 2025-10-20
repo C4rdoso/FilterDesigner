@@ -2,7 +2,7 @@
 # Digital Filter Designer
 
 A lightweight C++ library for **digital filter synthesis** on **embedded environments**, with support for runtime design adjustments.  
-This library aims to provide a flexible and efficient way to implement classical IIR filters such as **Butterworth** and **RBJ CookBook** directly on microcontrollers and other resource-constrained devices.
+This library aims to provide a flexible and efficient way to implement classical IIR filters such as **Butterworth** and **Chebyshev** directly on microcontrollers and other resource-constrained devices.
 
 ### ✨ Features
 
@@ -56,6 +56,6 @@ for (size_t index = 0; index < filter.m_num_sos; index++)
 
 - Fix odd order filter generation
 - Add support for arbitrary band-stop filters
-- Add Chebyshev Type I and Elliptic filter designs
+- Add Elliptic filter designs
 - Add CMSIS support for ARM architecture
 - Include fixed-point arithmetic mode for deeply embedded systems
