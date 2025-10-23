@@ -11,6 +11,9 @@ RBJCookbookBandpass KEYWORD1
 Chebyshev1Lowpass   KEYWORD1
 Chebyshev1Highpass  KEYWORD1
 Chebyshev1Bandpass  KEYWORD1
+Chebyshev2Lowpass   KEYWORD1
+Chebyshev2Highpass  KEYWORD1
+Chebyshev2Bandpass  KEYWORD1
 
 # Methods
 max KEYWORD2
