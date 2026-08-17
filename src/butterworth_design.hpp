@@ -305,5 +305,132 @@ namespace FilterDesigner {
 		}
 
 	};
+
+	template<typename precision, size_t order>
+	class ButterworthBandstop : public IIRGenericDesign<precision, order * 2, order * 2, order> {
+	public:
+		/* Butterworth band-stop filter constructor
+		 * @param precision& [Hz] Sampling rate of the input signal
+		 * @param precision& [Hz] Lower cutoff frequency for the band-stop filter
+		 * @param precision& [Hz] Upper cutoff frequency for the band-stop filter */
+		ButterworthBandstop(const precision& sample_rate, const precision& first_cut, const precision& second_cut) {
+			//Assigns the sampling frequency
+			this->m_sample_rate = sample_rate;
+
+			//Pre-warps the frequencies to the analog domain
+			this->m_first_cutoff = 2 * tan(M_PI * first_cut / sample_rate);
+			this->m_second_cutoff = 2 * tan(M_PI * second_cut / sample_rate);
+
+			this->design();
+		}
+
+	protected:
+		auto createPrototype() -> bool override {
+			//Calculates all poles and their conjugates for the low-pass filter prototype
+			for (size_t k = 0; k < order / 2; k++) {
+				double theta = (double)(2 * k + 1) * M_PI / (2 * order);
+				double real = -sin(theta);
+				double imag = cos(theta);
+
+				//Stores the calculated pole
+				this->m_poles[k * 2] = Complex<precision>(real, imag);
+
+				//Stores the conjugate right after it
+				this->m_poles[(k * 2) + 1] = Complex<precision>(real, -imag);
+			}
+
+			//If there is a real pole (in case of odd order)
+			if (order % 2 == 1) {
+				this->m_poles[order - 1] = Complex<precision>(-1.0, 0.0);
+			}
+
+			return true;
+		}
+
+		auto convertPrototype() -> bool override {
+			//Calculates the bandwidth and the analog cutoff frequency
+			const precision bandwidth = this->m_second_cutoff - this->m_first_cutoff;
+			const precision omega = sqrt(this->m_first_cutoff * this->m_second_cutoff);
+
+			//The number of analog poles equals the filter order
+			const size_t num_analogue_poles = order;
+
+			//Transforms the low-pass prototype into a band-stop filter by radially inverting the poles and shifting them to the stopband edges
+			//The number of poles in the band-stop filter is 2n
+			for (size_t index = 0; index < num_analogue_poles; index++) {
+				//Ignores null poles
+				if (cabs(this->m_poles[index]) == 0) continue;
+
+				//If it is a real pole (last pole in the odd-order filter)
+				if (this->m_poles[index].imag() == 0 && index == num_analogue_poles - 1 && (order % 2 == 1)) {
+					Complex<precision> base = Complex<precision>(bandwidth) / this->m_poles[index];
+
+					Complex<precision> first_half  = precision(0.5) * base + Complex<precision>(0, omega);
+					Complex<precision> second_half = precision(0.5) * base - Complex<precision>(0, omega);
+
+					this->m_poles[index] = first_half;
+					this->m_poles[index + num_analogue_poles] = second_half;
+
+					//Checks if all poles are in the left half-plane
+					if (first_half.real() > 0 || second_half.real() > 0) {
+						//Otherwise, stops the process and throws an exception
+						return false;
+					}
+				}
+
+				//If it is a complex pole
+				else {
+					//Radially inverts the pole using the bandwidth as the scaling factor
+					Complex<precision> base = Complex<precision>(bandwidth) / this->m_poles[index];
+
+					//Calculates the frequency shift term
+					Complex<precision> shift = csqrt(base * base - Complex<precision>(4 * omega * omega));
+
+					//The first half should be the sum of the base and the shift terms
+					const auto& first_half_pole = this->m_poles[index] = precision(0.5) * base + precision(0.5) * shift;
+
+					//The second half should be the difference between the base and the shift terms
+					const auto& second_half_pole = this->m_poles[index + num_analogue_poles] = precision(0.5) * base - precision(0.5) * shift;
+
+					//Checks if all poles are in the left half-plane
+					if (first_half_pole.real() > 0 || second_half_pole.real() > 0) {
+						//Otherwise, stops the process and throws an exception
+						return false;
+					}
+				}
+			}
+
+			//Places the transformed zeros at the notch frequency, on the imaginary axis
+			for (size_t index = 0; index < num_analogue_poles; index++) {
+				this->m_zeros[index * 2]       = Complex<precision>(0, omega);
+				this->m_zeros[(index * 2) + 1] = Complex<precision>(0, -omega);
+			}
+
+			//Calculates the initial gain of the filter (unity gain outside the stopband)
+			precision initial_gain = precision(1);
+
+			//Performs the plane conversion, calculates the zeros, and obtains the gain after conversion
+			this->m_overall_gain = planeConversion(initial_gain, this->m_poles, this->m_num_poles, this->m_zeros, this->m_num_zeros);
+
+			//Applies a gain correction
+			this->m_overall_gain = initial_gain * (initial_gain / this->m_overall_gain);
+
+			return true;
+		}
+
+		auto createSOS() -> bool override {
+			//Generates the second-order sections from the poles and zeros
+			zpk2Biquads<precision>(
+				this->m_poles, this->m_num_poles,
+				this->m_zeros, this->m_num_zeros,
+				this->m_overall_gain,
+				this->m_biquads, this->m_num_biquads
+			);
+
+			//If it reached this point, indicates success
+			return true;
+		}
+
+	};
 }
 #endif

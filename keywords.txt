@@ -5,15 +5,19 @@ IIRGenericDesign    KEYWORD1
 ButterworthLowpass  KEYWORD1
 ButterworthHighpass KEYWORD1
 ButterworthBandpass KEYWORD1
+ButterworthBandstop KEYWORD1
 RBJCookbookLowpass  KEYWORD1
 RBJCookbookHighpass KEYWORD1
 RBJCookbookBandpass KEYWORD1
+RBJCookbookBandstop KEYWORD1
 Chebyshev1Lowpass   KEYWORD1
 Chebyshev1Highpass  KEYWORD1
 Chebyshev1Bandpass  KEYWORD1
+Chebyshev1Bandstop  KEYWORD1
 Chebyshev2Lowpass   KEYWORD1
 Chebyshev2Highpass  KEYWORD1
 Chebyshev2Bandpass  KEYWORD1
+Chebyshev2Bandstop  KEYWORD1
 
 # Methods
 max KEYWORD2

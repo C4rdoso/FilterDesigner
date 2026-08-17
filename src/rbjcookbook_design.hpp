@@ -175,6 +175,60 @@ namespace FilterDesigner {
 		}
 	};
 
+	template<typename precision, size_t order>
+	class RBJCookbookBandstop : public IIRGenericDesign<precision, 0, 0, (order / 2) + (order % 2 == 1)> {
+	public:
+		/* RBJ Audio-EQ-Cookbook band-stop filter constructor
+		 * @param precision& [Hz] Sampling rate of the input signal
+		 * @param precision& [Hz] Lower cutoff frequency for the band-stop filter
+		 * @param precision& [Hz] Upper cutoff frequency for the band-stop filter */
+		RBJCookbookBandstop(const precision& sample_rate, const precision& first_cut, const precision& second_cut) {
+			//Assigns the sampling frequency and cutoff frequency
+			this->m_sample_rate = sample_rate;
+			this->m_first_cutoff  = first_cut;
+			this->m_second_cutoff = second_cut;
+
+			this->design();
+		}
+
+	protected:
+		auto createPrototype() -> bool override {
+			//The RBJ filter does not use analog poles or zeros
+			return true;
+		}
+
+		auto convertPrototype() -> bool override {
+			//The RBJ filter does not use prototype conversion
+			return true;
+		}
+
+		auto createSOS() -> bool override {
+			//Calculates the bandwidth and the analog cutoff frequency
+			const precision bandwidth = precision(2) * M_PI * (this->m_second_cutoff -  this->m_first_cutoff) / this->m_sample_rate;
+			const precision omega 		= precision(2) * M_PI * sqrt(this->m_first_cutoff * this->m_second_cutoff) / this->m_sample_rate;
+
+      		//ω for RBJ (digital) obtained from analog pre-warping
+      		const precision alpha  = sin(omega) * sinh(log(precision(2))/precision(2) * bandwidth / omega);
+			const precision cos_w0 = cos(omega);
+
+      		//Analytical RBJ coefficients for band-stop
+			precision a0 = precision(1) + alpha;
+
+      		precision b0 = precision(1) / a0;
+      		precision b1 = -precision(2) * cos_w0 / a0;
+      		precision b2 = precision(1) / a0;
+      		precision a1 = -precision(2) * cos_w0 / a0;
+      		precision a2 = (precision(1) - alpha) / a0;
+
+			//Forms the biquads from the second-order coefficients
+			for (size_t index = 0; index < this->m_num_biquads; index++)
+				this->m_biquads[index] = BiquadSection<precision>(b0, b1, b2, a0, -a1, -a2);
+
+			//If it reached this point, indicates success
+			return true;
+		}
+	};
+
 }
 
 #endif

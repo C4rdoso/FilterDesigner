@@ -63,8 +63,8 @@ for (size_t index = 0; index < filter.m_num_biquads; index++)
 
 ### 🔧 Planned Improvements
 
-- Fix odd order filter generation
-- Add support for arbitrary band-stop filters
-- Add Elliptic filter designs
-- Add CMSIS support for ARM architecture
-- Include fixed-point arithmetic mode for deeply embedded systems
+- 🔄 Fix odd order filter generation
+- ✅ Add support for arbitrary band-stop filters 
+- 🔄 Add Elliptic filter designs
+- 🔄 Add CMSIS support for ARM architecture
+- 🔄 Include fixed-point arithmetic mode for deeply embedded systems
